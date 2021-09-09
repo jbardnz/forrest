@@ -674,6 +674,16 @@ abstract class Client
     {
         return $this->httpClient;
     }
+    
+     /**
+     * Public accessor to the Token Repo.
+     *
+     * @return tokenRepo
+     */
+    public function getTokenRepo()
+    {
+        return $this->tokenRepo;
+    }
 
     /**
      * Accessor to get instance URL
