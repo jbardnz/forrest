@@ -22,6 +22,7 @@ use Omniphx\Forrest\Formatters\JSONFormatter;
 use Omniphx\Forrest\Formatters\URLEncodedFormatter;
 use Omniphx\Forrest\Formatters\XMLFormatter;
 use Omniphx\Forrest\Formatters\BaseFormatter;
+use Omniphx\Forrest\Formatters\CsvFormatter;
 
 /**
  * API resources.
@@ -215,6 +216,12 @@ abstract class Client
             }
         } else {
             unset($this->parameters['body']);
+        }
+        
+        if (isset($this->options['query'])) {
+            $this->parameters['query'] = http_build_query($this->options['query']);
+        } else {
+            unset($this->parameters['query']);
         }
 
         try {
@@ -792,6 +799,8 @@ abstract class Client
             $this->formatter = new XMLFormatter($this->tokenRepo, $this->settings);
         } else if ($formatter === 'none' && strpos(get_class($this->formatter), 'BaseFormatter') === false) {
             $this->formatter = new BaseFormatter($this->tokenRepo, $this->settings);
+        } elseif ($formatter === 'csv' && strpos(get_class($this->formatter), 'CsvFormatter') === false) {
+            $this->formatter = new CsvFormatter($this->tokenRepo, $this->settings);
         }
     }
 
@@ -857,7 +866,7 @@ abstract class Client
             $jsonError = json_encode($error,JSON_PRETTY_PRINT);
             throw new SalesforceException($jsonError, $ex);
         } else {
-            throw new SalesforceException('Invalid request: %s', $ex);
+            throw new SalesforceException(sprintf('Invalid request: %s', $ex->getMessage()), $ex);
         }
     }
 }
